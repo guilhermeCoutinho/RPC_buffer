@@ -1,14 +1,19 @@
 import xmlrpclib
 from SimpleXMLRPCServer import SimpleXMLRPCServer
+import threading
+
 BUFFER_SIZE = 3
 indexBuffer = -1
+
+mutex = threading.Semaphore(1)
 
 buffer = range(BUFFER_SIZE)
 
 server = SimpleXMLRPCServer(("localhost", 8080))
 
 def Store (data):
-	global indexBuffer
+	global mutex,indexBuffer
+	mutex.acquire()
 	if (indexBuffer == BUFFER_SIZE - 1):
 		print "full buffer"
 		return "full buffer"
@@ -17,9 +22,11 @@ def Store (data):
 		buffer[indexBuffer] = data
 		print ("Armazenei " + data)
 		return "Sucesso"
+	mutex.release()
 
 def Consume ():
-	global indexBuffer
+	global mutex,indexBuffer
+	mutex.acquire()
 	if (indexBuffer == -1):
 		return "empty buffer"
 		print "empty buffer"
@@ -27,6 +34,7 @@ def Consume ():
 		indexBuffer -= 1
 		print "Item consumido " + buffer[indexBuffer + 1]
 		return (buffer[indexBuffer+1] )
+	mutex.release()
 
 server.register_function(Store, "produce")
 server.register_function(Consume, "consume")
