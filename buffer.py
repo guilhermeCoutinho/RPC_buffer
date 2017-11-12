@@ -6,26 +6,28 @@ indexBuffer = -1
 
 buffer = range(BUFFER_SIZE)
 
-server = SimpleXMLRPCServer(("localhost", 1235))
+server = SimpleXMLRPCServer(("localhost", 8080))
 
 def Store (data):
 	if (indexBuffer == BUFFER_SIZE - 1):
-		print ("full buffer")
+		print "full buffer"
 		return "full buffer"
 	else:
-		buffer[++indexBuffer] = data
+		++indexBuffer
+		buffer[indexBuffer] = data
 		print ("Armazenei " + data)
 		return "Sucesso"
 
 def Consume ():
 	if (indexBuffer == -1):
-		return ("empty buffer")
-		print ("empty buffer")
+		return "empty buffer"
+		print "empty buffer"
 	else :
-		print ("item consumed from buffer " + buffer[indexBuffer])
-		return ("Consumed from buffer " + buffer[indexBuffer--])
-
+		--indexBuffer
+		print "Item consumido " + buffer[indexBuffer + 1]
+		return (buffer[indexBuffer+1] )
 
 server.register_function(Store, "produce")
 server.register_function(Consume, "consume")
+print "Servidor rodando na porta 8080"
 server.serve_forever()
