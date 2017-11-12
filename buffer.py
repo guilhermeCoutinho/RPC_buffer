@@ -15,26 +15,28 @@ def Store (data):
 	global mutex,indexBuffer
 	mutex.acquire()
 	if (indexBuffer == BUFFER_SIZE - 1):
-		print "full buffer"
+		mutex.release()
 		return "full buffer"
 	else:
 		indexBuffer += 1
 		buffer[indexBuffer] = data
 		print ("Armazenei " + data)
+		mutex.release()
 		return "Sucesso"
-	mutex.release()
 
 def Consume ():
 	global mutex,indexBuffer
 	mutex.acquire()
 	if (indexBuffer == -1):
+		mutex.release()
 		return "empty buffer"
 		print "empty buffer"
 	else :
 		indexBuffer -= 1
+		print (indexBuffer)
+		mutex.release()
 		print "Item consumido " + buffer[indexBuffer + 1]
 		return (buffer[indexBuffer+1] )
-	mutex.release()
 
 server.register_function(Store, "produce")
 server.register_function(Consume, "consume")
